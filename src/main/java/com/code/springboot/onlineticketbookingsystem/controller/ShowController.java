@@ -1,5 +1,6 @@
 package com.code.springboot.onlineticketbookingsystem.controller;
 
+import com.code.springboot.onlineticketbookingsystem.dto.ShowDTO;
 import com.code.springboot.onlineticketbookingsystem.model.Show;
 import com.code.springboot.onlineticketbookingsystem.repository.ShowRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,8 +28,10 @@ public class ShowController {
     // This method returns a list of all Show entities in the system
     // No authentication or authorization is required to access this endpoint
     @GetMapping
-    public ResponseEntity<List<Show>> getAllShows(){
-        return ResponseEntity.ok(showRepository.findAll());
+    public ResponseEntity<List<ShowDTO>> getAllShows(){
+        List<Show> shows = showRepository.findAll();
+        List<ShowDTO> showDTOs = shows.stream().map(ShowDTO::fromEntity).toList();
+        return ResponseEntity.ok(showDTOs);
     }
 
     // @PostMapping: Maps HTTP POST requests to this method
@@ -39,8 +42,10 @@ public class ShowController {
 
     // @Valid: Ensures that the input Show object is validated according to its constraints
     // @RequestBody: Maps the HTTP request body to the Show object
-    public ResponseEntity<Show> createShow(@Valid @RequestBody Show show) {
-        return ResponseEntity.ok(showRepository.save(show));
+    public ResponseEntity<ShowDTO> createShow(@Valid @RequestBody ShowDTO showDTO) {
+        Show show = ShowDTO.toEntity(showDTO);
+        Show saved = showRepository.save(show);
+        return ResponseEntity.ok(ShowDTO.fromEntity(saved));
     }
 
 
